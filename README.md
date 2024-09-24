@@ -73,7 +73,7 @@ Run the program using the following command:
 - **`s, --scale <SCALE>`**
   Scales the output image by multiplying its dimensions (width and height) by the specified value.
   Defaults to 0.0, meaning no scaling.
-- **`x, --saturation <SCALE>`**
+- **`x, --saturation <SATURATION>`**
   Saturate each individual pixel by the the specified pixel. This effect is applied after blending is done
   Defaults to 0.05.
 
