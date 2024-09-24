@@ -123,7 +123,7 @@ impl Recreate {
         }
     }
 
-    fn read_dir_to_vec(&mut self, dir_path: &str, ref_img: &str, verbose: bool) -> Result<()> {
+    fn read_dir_to_vec(&mut self, dir_path: &str, ref_img: &str, _verbose: bool) -> Result<()> {
         println!("pulling images...");
         const NTHREADS: u32 = 20;
         let mut children = vec![];
@@ -208,11 +208,15 @@ impl Recreate {
             img_width,
             img_height
         );
+        print_if!(
+            verbose,
+            "Attempting to adjust specified grid columns and rows"
+        );
         let grid_cols = next_divisor(img_width, grid_cols)?;
         let grid_rows = next_divisor(img_height, grid_rows)?;
         print_if!(
             verbose,
-            "grid_cols: {}, grid_rows: {}",
+            "Selected grid values-> grid_cols: {}, grid_rows: {}",
             grid_cols,
             grid_rows
         );
@@ -276,17 +280,19 @@ impl Recreate {
         print_if!(verbose, "Image collaging process complete");
 
         print_if!(verbose, "Constructing image collage...");
+        let split_path: Vec<&str> = path.split("/").collect();
+        let dir = split_path[split_path.len() - 2];
         // Save the output image
         reconstructed_img_buffer
             .read()
             .unwrap()
-            .save(format!("./{}/output.png", path))
-            .with_context(|| format!("Couldn't save image"))?;
+            .save(format!("./{}/output.png", dir))
+            .with_context(|| format!("Couldn't save image in path: ./{}/output.png", dir))?;
 
         print_if!(
             verbose,
             "Image collage fully constructed. Check output at -> ./{}/output.png",
-            path
+            dir
         );
         Ok(())
     }
@@ -297,11 +303,11 @@ fn main() -> Result<()> {
 
     let args = Args::parse();
     let split_ref_path: Vec<&str> = args.r#ref.split("/").collect();
-    println!(
-        "Args: {:?}, {:?}",
-        args,
-        split_ref_path[split_ref_path.len() - 1]
-    );
+    // println!(
+    //     "Args: {:?}, {:?}",
+    //     args,
+    //     split_ref_path[split_ref_path.len() - 1]
+    // );
 
     let mut recreate = Recreate::new();
     let _ = recreate.read_dir_to_vec(
@@ -336,20 +342,6 @@ fn divide_image_into_grid(
             // Calculate start and end coordinates for this cell
             let x_start = x * cell_width;
             let y_start = y * cell_height;
-
-            // // For the last column, ensure the width matches the remaining image width
-            // let x_end = if x == grid_width - 1 {
-            //     img_width
-            // } else {
-            //     (x + 1) * cell_width
-            // };
-
-            // // For the last row, ensure the height matches the remaining image height
-            // let y_end = if y == grid_height - 1 {
-            //     img_height
-            // } else {
-            //     (y + 1) * cell_height
-            // };
 
             // Create the sub-image (portion) for this grid cell
             let cell_image = image.crop(x_start, y_start, cell_width, cell_height);
