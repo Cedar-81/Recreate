@@ -11,8 +11,8 @@
 
 ## Project Inspiration
 
-I saw this fan art project that was created by the offical Olivia Rodrigo fan account- one of my favorite artists, and I thought it looked cool [twitter post here](https://x.com/LiviesHQ/status/1833234088523927813). I decided to create a Rust tool that lets you do something similar. All you need to do is specify an image directory and some command-line options, and you're good to go!
-    ### Here is the fan art/GUTS album cover collage
+I saw this fan art project that was created by the offical Olivia Rodrigo fan account- one of my favorite artists, and I thought it looked cool [twitter post here](https://x.com/LiviesHQ/status/1833234088523927813). I decided to create a Rust tool that lets you do something similar. All you need to do is specify an image directory and some command-line options, and you're good to go! <br/>
+Here is the fan art/GUTS album cover collage
     <p align="center">
         <img src="https://pbs.twimg.com/media/GXD0rxxWgAA2iHf?format=jpg&name=large" alt="image from the twitter post" width="400"/>
     </p>
