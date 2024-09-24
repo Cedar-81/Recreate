@@ -9,6 +9,14 @@
 - **Blending:** Control how much the images blend with the dominant color of their respective grid region.
 - **Multithreading:** Utilizes multi-threading to improve performance when processing large sets of images.
 
+## Project Inspiration
+
+I saw this fan art project that was created by the offical Olivia Rodrigo fan account- one of my favorite artists, and I thought it looked cool [twitter post here](https://x.com/LiviesHQ/status/1833234088523927813). I decided to create a Rust tool that lets you do something similar. All you need to do is specify an image directory and some command-line options, and you're good to go!
+    ### Here is the fan art/GUTS album cover collage
+    <p align="center">
+        <img src="https://pbs.twimg.com/media/GXD0rxxWgAA2iHf?format=jpg&name=large" alt="image from the twitter post" width="400"/>
+    </p>
+
 ## Installation
 
 1. Ensure you have Rust installed on your machine. If not, download and install it from [here](https://www.rust-lang.org/tools/install).
