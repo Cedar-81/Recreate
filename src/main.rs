@@ -7,6 +7,7 @@ use palette::{FromColor, IntoColor, Lab, Srgb, Xyz};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
+use std::fmt::Arguments;
 use std::{
     fs,
     ops::{Add, Mul},
@@ -90,6 +91,24 @@ struct Args {
     /// If not passed this value is set to 0.7 by default
     #[arg(short, long, default_value_t = 0.7)]
     alpha: f32,
+
+    /// This prints info about the process running
+    /// This is true by default
+    #[arg(short, long, default_value_t = true)]
+    verbose: bool,
+}
+
+fn print_if(determiner: bool, args: Arguments) {
+    if determiner {
+        println!("{}", args);
+    }
+}
+
+// A helper macro to make it more ergonomic to use, similar to println!
+macro_rules! print_if {
+    ($determiner:expr, $($arg:tt)*) => {
+        print_if($determiner, format_args!($($arg)*));
+    };
 }
 
 #[derive(Debug, Default)]
@@ -104,7 +123,7 @@ impl Recreate {
         }
     }
 
-    fn read_dir_to_vec(&mut self, dir_path: &str, ref_img: &str) -> Result<()> {
+    fn read_dir_to_vec(&mut self, dir_path: &str, ref_img: &str, verbose: bool) -> Result<()> {
         println!("pulling images...");
         const NTHREADS: u32 = 20;
         let mut children = vec![];
@@ -170,27 +189,49 @@ impl Recreate {
         Ok(())
     }
 
-    fn collage(&mut self, path: &str, grid_rows: u32, grid_cols: u32, alpha: f32) -> Result<()> {
-        println!("collaging...");
+    fn collage(
+        &mut self,
+        path: &str,
+        grid_rows: u32,
+        grid_cols: u32,
+        alpha: f32,
+        verbose: bool,
+    ) -> Result<()> {
+        println!("initiating collage process...");
         let mut img = open(path)
             .with_context(|| format!("Couldn't open image in specified path: {}", path))?;
 
         let (img_width, img_height) = img.dimensions();
-        println!(
+        print_if!(
+            verbose,
             "ref_img_width: {}, ref_img_height: {}",
-            img_width, img_height
+            img_width,
+            img_height
         );
         let grid_cols = next_divisor(img_width, grid_cols)?;
         let grid_rows = next_divisor(img_height, grid_rows)?;
-        println!("grid_cols: {}, grid_rows: {}", grid_cols, grid_rows);
+        print_if!(
+            verbose,
+            "grid_cols: {}, grid_rows: {}",
+            grid_cols,
+            grid_rows
+        );
 
+        print_if!(
+            verbose,
+            "Dividing reference image into {}x{} grid",
+            grid_cols,
+            grid_rows
+        );
         let image_grid = divide_image_into_grid(&mut img, grid_cols, grid_rows);
+        print_if!(verbose, "Griding process complete");
 
         // Create a shared buffer for the reconstructed image using Mutex for safe access
         let reconstructed_img_buffer = Arc::new(RwLock::new(
             ImageBuffer::<image::Rgba<u8>, Vec<u8>>::new(img_width, img_height),
         ));
 
+        print_if!(verbose, "Image collaging process initialized");
         // Parallel processing of image grid portions
         image_grid
             .par_iter()
@@ -232,14 +273,21 @@ impl Recreate {
                     }
                 }
             });
+        print_if!(verbose, "Image collaging process complete");
 
+        print_if!(verbose, "Constructing image collage...");
         // Save the output image
         reconstructed_img_buffer
             .read()
             .unwrap()
-            .save("./guts/output.png")
+            .save(format!("./{}/output.png", path))
             .with_context(|| format!("Couldn't save image"))?;
 
+        print_if!(
+            verbose,
+            "Image collage fully constructed. Check output at -> ./{}/output.png",
+            path
+        );
         Ok(())
     }
 }
@@ -256,8 +304,12 @@ fn main() -> Result<()> {
     );
 
     let mut recreate = Recreate::new();
-    let _ = recreate.read_dir_to_vec(&args.dir, split_ref_path[split_ref_path.len() - 1])?;
-    let _ = recreate.collage(&args.r#ref, args.rows, args.cols, args.alpha)?;
+    let _ = recreate.read_dir_to_vec(
+        &args.dir,
+        split_ref_path[split_ref_path.len() - 1],
+        args.verbose,
+    )?;
+    let _ = recreate.collage(&args.r#ref, args.rows, args.cols, args.alpha, args.verbose)?;
 
     Ok(())
 }
