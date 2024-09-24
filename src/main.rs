@@ -8,6 +8,7 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 use std::fmt::Arguments;
+use std::time::Instant;
 use std::{
     fs,
     ops::{Add, Mul},
@@ -96,6 +97,18 @@ struct Args {
     /// This is true by default
     #[arg(short, long, default_value_t = true)]
     verbose: bool,
+
+    /// This resizes the image to a square layout using the image width. It also prevents the adjustment of specified number of grid columns and rows
+    /// This is true by default
+    #[arg(short = 'c', long, default_value_t = true)]
+    resize: bool,
+
+    /// This scales up the image by specified number of times by multiplying its width and height by specified float value
+    /// Eg. If 2.5 is entered the scaled image resolution will be img_width * 2.5 x img_height * 2.5
+    /// This is 0.0 by default.
+    /// Note: 0.0 indicates no scaling is required.
+    #[arg(short, long, default_value_t = 0.0)]
+    scale: f32,
 }
 
 fn print_if(determiner: bool, args: Arguments) {
@@ -196,18 +209,35 @@ impl Recreate {
         grid_cols: u32,
         alpha: f32,
         verbose: bool,
+        resize: bool,
+        scale: f32,
     ) -> Result<()> {
         println!("initiating collage process...");
         let mut img = open(path)
             .with_context(|| format!("Couldn't open image in specified path: {}", path))?;
 
-        let (img_width, img_height) = img.dimensions();
+        let (mut img_width, mut img_height) = img.dimensions();
         print_if!(
             verbose,
             "ref_img_width: {}, ref_img_height: {}",
             img_width,
             img_height
         );
+
+        if resize {
+            print_if!(verbose, "Resizing ref image to {}x{}", img_width, img_width);
+            img = img.resize_exact(img_width, img_width, FilterType::CatmullRom);
+            (img_width, img_height) = img.dimensions()
+        }
+
+        if scale != 0.0 {
+            let new_width = (img_width as f32 * scale).ceil() as u32;
+            let new_height = (img_height as f32 * scale).ceil() as u32;
+            print_if!(verbose, "Scaling ref image to {}x{}", new_width, new_height);
+            img = img.resize_exact(new_width, new_height, FilterType::CatmullRom);
+            (img_width, img_height) = img.dimensions()
+        }
+
         print_if!(
             verbose,
             "Attempting to adjust specified grid columns and rows"
@@ -299,7 +329,8 @@ impl Recreate {
 }
 
 fn main() -> Result<()> {
-    // println!("image vec: {:?}", a);
+    // Start the timer
+    let start = Instant::now();
 
     let args = Args::parse();
     let split_ref_path: Vec<&str> = args.r#ref.split("/").collect();
@@ -315,7 +346,20 @@ fn main() -> Result<()> {
         split_ref_path[split_ref_path.len() - 1],
         args.verbose,
     )?;
-    let _ = recreate.collage(&args.r#ref, args.rows, args.cols, args.alpha, args.verbose)?;
+    let _ = recreate.collage(
+        &args.r#ref,
+        args.rows,
+        args.cols,
+        args.alpha,
+        args.verbose,
+        args.resize,
+        args.scale,
+    )?;
+
+    // Calculate the elapsed time
+    let duration = start.elapsed();
+
+    println!("Time taken: {:?}", duration);
 
     Ok(())
 }
