@@ -1,8 +1,6 @@
 # Recreate: Image Collage Generator
 
-**Version:** 1.0  
-**Author:** [Your Name]  
-**Description:** `Recreate` is a Rust-based CLI tool for generating collages by blending images with dominant colors from specific regions of a reference image. The tool supports parallel processing for faster image handling.
+`Recreate` is a Rust-based CLI tool for generating collages by blending images with dominant colors from specific regions of a reference image. The tool supports parallel processing for faster image handling.
 
 ## Features
 - **Create Collages:** Recreate a reference image using smaller images from a specified directory.
