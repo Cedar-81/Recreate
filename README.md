@@ -13,6 +13,7 @@
 
 I saw this fan art project that was created by the offical Olivia Rodrigo fan account- one of my favorite artists, and I thought it looked cool [twitter post here](https://x.com/LiviesHQ/status/1833234088523927813). I decided to create a Rust tool that lets you do something similar. All you need to do is specify an image directory and some command-line options, and you're good to go! <br/>
 Here is the fan art/GUTS album cover collage
+`PS: Click on image/load it in a new tab and zoom to see each individual image`
     <p align="center">
         <img src="https://pbs.twimg.com/media/GXD0rxxWgAA2iHf?format=jpg&name=large" alt="image from the twitter post" width="400"/>
     </p>
@@ -117,6 +118,7 @@ Here’s an example showing how to use `Recreate`:
     <img src="https://github.com/Cedar-81/Recreate/blob/main/example_images/g_ref3.webp" alt="guts olivia rodrigo alt album cover" width="400"/>
     <img src="https://github.com/Cedar-81/Recreate/blob/main/example_images/output.png" alt="guts olivia rodrigo alt album cover collage" width="400"/>
 </p>
+`PS: Click on second image/load it in a new tab and zoom to see each individual image`
   
 
 ## How It Works
