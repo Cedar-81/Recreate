@@ -14,31 +14,30 @@
 I saw this fan art project that was created by the offical Olivia Rodrigo fan account- one of my favorite artists, and I thought it looked cool [twitter post here](https://x.com/LiviesHQ/status/1833234088523927813). I decided to create a Rust tool that lets you do something similar. All you need to do is specify an image directory and some command-line options, and you're good to go! <br/>
 Here is the fan art/GUTS album cover collage
 `PS: Click on image/load it in a new tab and zoom to see each individual image`
-    <p align="center">
-        <img src="https://pbs.twimg.com/media/GXD0rxxWgAA2iHf?format=jpg&name=large" alt="image from the twitter post" width="400"/>
-    </p>
+<p align="center">
+<img src="https://pbs.twimg.com/media/GXD0rxxWgAA2iHf?format=jpg&name=large" alt="image from the twitter post" width="400"/>
+</p>
 
 ## Installation
 
 1. Ensure you have Rust installed on your machine. If not, download and install it from [here](https://www.rust-lang.org/tools/install).
 2. Clone the repository:
-    
-    ```bash
-    git clone <https://github.com/yourusername/recreate.git>
-    ```
-    
+
+   ```bash
+   git clone <https://github.com/yourusername/recreate.git>
+   ```
+
 3. Navigate to the directory:
-    
-    ```bash
-    cd recreate
-    ```
-    
+
+   ```bash
+   cd recreate
+   ```
+
 4. Build the project:
-    
-    ```bash
-    cargo build --release
-    ```
-    
+
+   ```bash
+   cargo build --release
+   ```
 
 ## Usage
 
@@ -57,41 +56,26 @@ Run the program using the following command:
 ### Optional Arguments:
 
 - **`c, --cols <COLS>`**
-    
-    Number of columns in the collage grid.
-    
-    If not provided, the value defaults to 70. This value is adjusted to the nearest multiple of the reference image's width, if necessary.
-    
+  Number of columns in the collage grid.
+  If not provided, the value defaults to 70. This value is adjusted to the nearest multiple of the reference image's width, if necessary.
 - **`r, --rows <ROWS>`**
-    
-    Number of rows in the collage grid.
-    
-    If not provided, the value defaults to 70. This value is adjusted to the nearest multiple of the reference image's height, if necessary.
-    
+  Number of rows in the collage grid.
+  If not provided, the value defaults to 70. This value is adjusted to the nearest multiple of the reference image's height, if necessary.
 - **`a, --alpha <ALPHA>`**
-    
-    Specifies the blending factor between the reference image's dominant color and the smaller images.
-    
-    Defaults to 0.7 (70% blend).
-    
+  Specifies the blending factor between the reference image's dominant color and the smaller images.
+  Defaults to 0.7 (70% blend).
 - **`v, --verbose`**
-    
-    Enables verbose output to print additional information about the process.
-    
-    Defaults to `true`.
-    
+  Enables verbose output to print additional information about the process.
+  Defaults to `true`.
 - **`c, --resize`**
-    
-    Resizes the reference image to a square layout using its width. Prevents the adjustment of specified grid columns and rows.
-    
-    Defaults to `true`.
-    
+  Resizes the reference image to a square layout using its width. Prevents the adjustment of specified grid columns and rows.
+  Defaults to `true`.
 - **`s, --scale <SCALE>`**
-    
-    Scales the output image by multiplying its dimensions (width and height) by the specified value.
-    
-    Defaults to 0.0, meaning no scaling.
-    
+  Scales the output image by multiplying its dimensions (width and height) by the specified value.
+  Defaults to 0.0, meaning no scaling.
+- **`x, --saturation <SCALE>`**
+  Saturate each individual pixel by the the specified pixel. This effect is applied after blending is done
+  Defaults to 0.05.
 
 ### Example:
 
@@ -119,7 +103,7 @@ Here’s an example showing how to use `Recreate`:
     <img src="https://github.com/Cedar-81/Recreate/blob/main/example_images/output.png" alt="guts olivia rodrigo alt album cover collage" width="400"/>
 </p>
 <code>PS: Click on second image/load it in a new tab and zoom to see each individual image</code>
-  
+
 
 ## How It Works
 

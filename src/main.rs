@@ -1,6 +1,9 @@
 use anyhow::{anyhow, Context, Result};
 use clap::Parser;
+use image::Pixel;
 use image::{imageops::FilterType, open, DynamicImage, GenericImageView, ImageBuffer, Rgba};
+use image_effects::effect::Affectable;
+use image_effects::filter::{self, filters};
 use kmeans_colors::{get_kmeans, Kmeans, Sort};
 use palette::cast::from_component_slice;
 use palette::{FromColor, IntoColor, Lab, Srgb, Xyz};
@@ -88,7 +91,8 @@ struct Args {
     #[arg(short, long, default_value_t = 70)]
     rows: u32,
 
-    /// This inidates how much the images are blended to look more like the dominant color of its placement position
+    /// This inidates how much the images are blended to look more like the dominant color of its placement position.
+    /// Value should range from 0.0 to 1.0
     /// If not passed this value is set to 0.7 by default
     #[arg(short, long, default_value_t = 0.7)]
     alpha: f32,
@@ -102,6 +106,13 @@ struct Args {
     /// This is true by default
     #[arg(short = 'c', long, default_value_t = true)]
     resize: bool,
+
+    /// This saturates each individual pixel.
+    /// This value should range from 0.0 to 0.1
+    /// Note a little change has a huge effect.
+    /// This is set to 0.05 by default
+    #[arg(short = 'x', long, default_value_t = 0.05)]
+    saturation: f32,
 
     /// This scales up the image by specified number of times by multiplying its width and height by specified float value
     /// Eg. If 2.5 is entered the scaled image resolution will be img_width * 2.5 x img_height * 2.5
@@ -211,6 +222,7 @@ impl Recreate {
         verbose: bool,
         resize: bool,
         scale: f32,
+        saturation: f32,
     ) -> Result<()> {
         println!("initiating collage process...");
         let mut img = open(path)
@@ -282,7 +294,7 @@ impl Recreate {
                 let resized_img =
                     img_list[random_number].resize_exact(p_width, p_height, FilterType::Lanczos3);
 
-                // dominant color in portion
+                // get dominant color in portion
                 let portion_bytes = portion.as_rgb8().unwrap().clone().into_raw();
                 let dom_color = lab_to_rgba_u8(calc_dominant_color(portion_bytes));
 
@@ -298,10 +310,21 @@ impl Recreate {
                             //blend pixel color with dominant color using LERP
                             let p_final =
                                 RgbaWrapper(pixel) * (1.0 - alpha) + RgbaWrapper(dom_color) * alpha;
+                            //saturate pixel
+                            let p_final_rgba = p_final.0.to_rgba();
+                            let saturated_pixel = Rgba(
+                                [
+                                    p_final_rgba[0],
+                                    p_final_rgba[1],
+                                    p_final_rgba[2],
+                                    p_final_rgba[3],
+                                ]
+                                .apply(&filters::Saturate(saturation)),
+                            );
                             reconstructed_img_buffer.write().unwrap().put_pixel(
                                 x_start + x,
                                 y_start + y,
-                                p_final.0,
+                                saturated_pixel,
                             );
                         }
                     }
@@ -312,10 +335,13 @@ impl Recreate {
         print_if!(verbose, "Constructing image collage...");
         let split_path: Vec<&str> = path.split("/").collect();
         let dir = split_path[split_path.len() - 2];
+
+        let reconstructed_img = reconstructed_img_buffer.read().unwrap();
+
+        // let sat_reconstructed_iimg = dyn_reconstructed_img.apply(&filters::HueRotate(180.0));
+
         // Save the output image
-        reconstructed_img_buffer
-            .read()
-            .unwrap()
+        reconstructed_img
             .save(format!("./{}/output.png", dir))
             .with_context(|| format!("Couldn't save image in path: ./{}/output.png", dir))?;
 
@@ -354,6 +380,7 @@ fn main() -> Result<()> {
         args.verbose,
         args.resize,
         args.scale,
+        args.saturation,
     )?;
 
     // Calculate the elapsed time
