@@ -118,7 +118,7 @@ Here’s an example showing how to use `Recreate`:
     <img src="https://github.com/Cedar-81/Recreate/blob/main/example_images/g_ref3.webp" alt="guts olivia rodrigo alt album cover" width="400"/>
     <img src="https://github.com/Cedar-81/Recreate/blob/main/example_images/output.png" alt="guts olivia rodrigo alt album cover collage" width="400"/>
 </p>
-`PS: Click on second image/load it in a new tab and zoom to see each individual image`
+<code>PS: Click on second image/load it in a new tab and zoom to see each individual image</code>
   
 
 ## How It Works
