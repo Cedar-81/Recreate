@@ -1,0 +1,11 @@
+# Ignore the target directory (common in Rust projects)
+target/
+
+# Ignore build directory
+build/
+
+# Ignore logs directory
+logs/
+
+# Ignore image directory
+guts/
